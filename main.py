@@ -1,9 +1,24 @@
 from praisonaiagents import Agent, MCP
+import gradio as gr
+print(gr.__version__)
 
-search_agent = Agent(
-    instructions="""You help book apartments on Airbnb.""",
-    llm="ollama/llama3",
-    tools=MCP("npx -y @openbnb/mcp-server-airbnb --ignore-robots-txt")
+def search_airbnb(query):
+    agent =  Agent(
+        instructions="""You help book apartments on Airbnb.""",
+        llm="ollama/llama3",
+        tools=MCP("npx -y @openbnb/mcp-server-airbnb --ignore-robots-txt")
+    )
+
+    result = agent.start(query)
+    return f"## Airbnb Results\n\n{result}"
+
+demo = gr.Interface(
+    fn=search_airbnb,
+    inputs=gr.Textbox(placeholder="I want to book an apartment in ..."),
+    outputs=gr.Markdown(),
+    title="Airbnb Booking Assitant",
+    description="Enter your booking requirements below:" 
 )
 
-search_agent.start("Search fo Apartments in Antananarivo , Madagascar for 2 nights. 28/04/25 - 30/04/25 for 50 euros per night")
+if __name__ == "__main__":
+    demo.launch()
